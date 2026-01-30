@@ -1,0 +1,1108 @@
+---
+title: "Clean_transcript"
+author: "Andrew Anderson"
+date: "2025-01-27"
+output: pdf_document
+---
+
+```{r}
+library(MASS)
+library(EBSeq)
+library(DESeq2)
+library(nlme)
+library(lme4)
+library(lmerTest)
+library(piecewiseSEM)
+ac <- read.csv("~/Desktop/JTR_xscript/JT_full_counts.csv")
+ac<-ac[4:25907,]
+rownames(ac)<-ac$X
+ac<-ac[,2:43]
+ac<-as.matrix(ac)
+df<-read.csv("~/Desktop/JTR_xscript/hormone_data.csv")
+df<-df[order(df$ID.1),]
+
+###Set for DESEQ
+Species<-rep("transcriptus", 42)
+Region<-rep(c("OT","POA","Vd"),each =14)
+Sex<-rep(rep(c("female","male"),each = 7),3)
+Size<-rep(rep(c("big","small","big","small"),times=c(3,4,4,3)),3)
+cond<-data.frame(Species,Region,Sex,Size)
+cond<-as.matrix(cond)
+rownames(cond)<-colnames(ac)
+
+###Get target list AR1, AR2, ER1, ER2a, ER2b, GER1, PrR, HSD17b4, HSD11b2, srd5a1,srd5a2a,srd5a2b,srd5a3, Aromatase, Brain aromatase
+gene_id_nb<-c("LOC102795905","LOC102776319","esr1","esr2a","LOC102788126","gper1","pgr","hsd17b4","hsd11b2","srd5a1","LOC102787127","srd5a2b","srd5a3","LOC102783408","LOC102793447")
+```
+
+```{r}
+####Extract POA samples
+jt_poa<-ac[,15:28]
+
+####Drop genes with samples with more than half having less than 10 reads
+dl<-c()
+for(i in 1:length(rownames(jt_poa)))
+{
+    genei<-jt_poa[i,]
+    if((count(genei>10)<7)=="TRUE")
+    {
+        dl<-c(dl,i)   
+    }
+}
+jt_poa<-jt_poa[-dl,]
+
+####Normalize read counts for NMDS
+jt_poa_norm<-vst(jt_poa)
+
+####Get coefficient of variation for each gene
+poa_coefv<-c()
+for(i in 1:length(rownames(jt_poa_norm)))
+{
+    genei<-jt_poa_norm[i,]
+    cvi<-100*(sd(genei)/mean(genei))
+    poa_coefv<-c(poa_coefv,cvi)   
+}
+
+####Select groupings based on most variation
+jt_poa_normtopk<-jt_poa_norm[order(-poa_coefv)[1:1000],]
+jt_poa_normtop1<-jt_poa_norm[order(-poa_coefv)[1:100],]
+jt_poa_normtop5<-jt_poa_norm[order(-poa_coefv)[1:500],]
+poa_pc_1k<-prcomp(scale(t(jt_poa_normtopk)))
+poa_pc_5c<-prcomp(scale(t(jt_poa_normtop5)))
+poa_pc_1c<-prcomp(scale(t(jt_poa_normtop1)))
+poa_pc_all<-prcomp(scale(t(jt_poa_norm)))
+
+```
+
+###Check for Outliers
+```{r}
+###Look for Outliers 1c
+d <- dist(t(jt_poa_normtop1))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_poa_normtop1), cex=.7)
+
+###Female Small 2 is outlier
+d <- dist(t(jt_poa_normtop1[,c(1:4,6:14)]))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_poa_normtop1)[c(1:4,6:14)], cex=.7)
+
+###Look for Outliers 5c
+d <- dist(t(jt_poa_normtop5))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_poa_normtop5), cex=.7)
+
+###Female Small 2 is outlier
+d <- dist(t(jt_poa_normtop5[,c(1:4,6:14)]))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_poa_normtop5)[c(1:4,6:14)], cex=.7)
+
+###Look for Outliers 1k
+d <- dist(t(jt_poa_normtopk))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_poa_normtopk), cex=.7)
+
+###Female Small 2 is outlier
+d <- dist(t(jt_poa_normtopk[,c(1:4,6:14)]))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_poa_normtopk)[c(1:4,6:14)], cex=.7)
+
+```
+
+####Extract POA samples dropping outlier (Female Small 2) and retest
+```{r}
+jt_poa<-ac[,c(15:18,20:28)]
+
+####Drop genes with samples with more than half having less than 10 reads
+dl<-c()
+for(i in 1:length(rownames(jt_poa)))
+{
+    genei<-jt_poa[i,]
+    if((count(genei>10)<7)=="TRUE")
+    {
+        dl<-c(dl,i)   
+    }
+}
+jt_poa<-jt_poa[-dl,]
+
+####Normalize read counts for NMDS
+jt_poa_norm<-vst(jt_poa)
+
+####Get coefficient of variation for each gene
+poa_coefv<-c()
+for(i in 1:length(rownames(jt_poa_norm)))
+{
+    genei<-jt_poa_norm[i,]
+    cvi<-100*(sd(genei)/mean(genei))
+    poa_coefv<-c(poa_coefv,cvi)   
+}
+
+####Select groupings based on most variation
+jt_poa_normtopk<-jt_poa_norm[order(-poa_coefv)[1:1000],]
+jt_poa_normtop1<-jt_poa_norm[order(-poa_coefv)[1:100],]
+jt_poa_normtop5<-jt_poa_norm[order(-poa_coefv)[1:500],]
+poa_pc_1k<-prcomp(scale(t(jt_poa_normtopk)))
+poa_pc_5c<-prcomp(scale(t(jt_poa_normtop5)))
+poa_pc_1c<-prcomp(scale(t(jt_poa_normtop1)))
+poa_pc_all<-prcomp(scale(t(jt_poa_norm)))
+```
+
+###Check again for Outlier
+```{r}
+###Look for Outliers 1c
+d <- dist(t(jt_poa_normtop1))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_poa_normtop1), cex=.7)
+
+###No clear Outlier
+
+###Look for Outliers 5c
+d <- dist(t(jt_poa_normtop5))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_poa_normtop5), cex=.7)
+
+###Possible Small Male 2 on 2nd Coord
+
+###Look for Outliers 1k
+d <- dist(t(jt_poa_normtopk))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_poa_normtopk), cex=.7)
+
+###Possible Small Male 2, but only at 1k
+###Keep him in
+```
+
+
+###Model selection POA. Dropping the outlier
+```{r}
+JT_Cond<-c("FB","FB","FB","FS","FS","FS","FS","MB","MB","MB","MB","MS","MS","MS")
+pat_jtr<-GetPatterns(JT_Cond)
+###Normalization for EBSeq--Note this data set is the raw read counts
+norm_jt_poa=MedianNorm(jt_poa)
+
+###Test of all fifteen models--Prediction 1
+out_jt_poa=EBMultiTest(jt_poa,NgVector=NULL,Conditions=JT_Cond[c(1:4,6:14)], AllParti= pat_jtr, sizeFactors=norm_jt_poa, maxround=100)
+
+###Get summary of models
+sumout_jt_poa=GetMultiPP(out_jt_poa)
+
+###Get list table of how many genes fall under each model
+table(sumout_jt_poa$MAP)
+table(sumout_jt_poa$MAP)[2:15]*100/(sum(table(sumout_jt_poa$MAP))-table(sumout_jt_poa$MAP)[1])
+sumout_jt_poa$Patterns
+
+###Sample for go_terms
+write.csv(names(sumout_jt_poa$MAP)[which(sumout_jt_poa$MAP == "pattern6")],"~/Desktop/JTR_xscript/goterm_search/poa_p6.csv")
+write.csv(names(sumout_jt_poa$MAP)[which(sumout_jt_poa$MAP == "pattern3")],"~/Desktop/JTR_xscript/goterm_search/poa_p3.csv")
+write.csv(names(sumout_jt_poa$MAP)[which(sumout_jt_poa$MAP == "pattern8")],"~/Desktop/JTR_xscript/goterm_search/poa_p8.csv")
+
+###Find the number of up and down regulated genes in each grouping
+xp_poa_p3<-jt_poa_norm[which(rownames(jt_poa_norm) %in% names(sumout_jt_poa$MAP)[which(sumout_jt_poa$MAP == "pattern3")]),]
+lmale<-apply(xp_poa_p3[,7:10],1,mean)
+other<-apply(xp_poa_p3[,c(1:6,11:13)],1,mean)
+print("p3")
+table(lmale-other>0)
+
+xp_poa_p4<-jt_poa_norm[which(rownames(jt_poa_norm) %in% names(sumout_jt_poa$MAP)[which(sumout_jt_poa$MAP == "pattern4")]),]
+male<-apply(xp_poa_p4[,7:13],1,mean)
+female<-apply(xp_poa_p4[,c(1:6)],1,mean)
+print("p4")
+table(male-female>0)
+
+xp_poa_p5<-jt_poa_norm[which(rownames(jt_poa_norm) %in% names(sumout_jt_poa$MAP)[which(sumout_jt_poa$MAP == "pattern5")]),]
+sfemale<-apply(xp_poa_p5[,4:6],1,mean)
+other<-apply(xp_poa_p5[,c(1:3,7:13)],1,mean)
+print("p5")
+table(sfemale-other>0)
+
+xp_poa_p6<-jt_poa_norm[which(rownames(jt_poa_norm) %in% names(sumout_jt_poa$MAP)[which(sumout_jt_poa$MAP == "pattern6")]),]
+big<-apply(xp_poa_p6[,c(1:3,7:10)],1,mean)
+small<-apply(xp_poa_p6[,c(4:6,11:13)],1,mean)
+print("p6")
+table(big-small>0)
+
+xp_poa_p8<-jt_poa_norm[which(rownames(jt_poa_norm) %in% names(sumout_jt_poa$MAP)[which(sumout_jt_poa$MAP == "pattern8")]),]
+lfemale<-apply(xp_poa_p8[,1:3],1,mean)
+other<-apply(xp_poa_p8[,c(4:13)],1,mean)
+print("p8")
+table(lfemale-other>0)
+
+###Sample on just our target genes
+tar_gen_poa<-jt_poa[which(rownames(jt_poa) %in% gene_id_nb),]
+
+###Model work again on target genes--Prediction 2 and 3
+out_jt_tar_poa=EBMultiTest(tar_gen_poa,NgVector=NULL,Conditions=JT_Cond[c(1:4,6:14)], AllParti= pat_jtr, sizeFactors=norm_jt_poa, maxround=100)
+sumout_jt_tar_poa=GetMultiPP(out_jt_tar_poa)
+sumout_jt_tar_poa$MAP
+```
+
+####Imput Hormone and behavior data for use in PATH analysis
+```{r}
+##Grab normalized read counts from DESeq2 from earlier
+poa_norm_select<-t(jt_poa_norm[which(rownames(jt_poa_norm) %in% gene_id_nb),])
+colnames(poa_norm_select)<-c("hsd11b2","ara","esr2b","cyp19a1b","hsd17b4","esr1","esr2a","arb")
+poa.df<-data.frame(df[c(1:4,6:14),c(1:4,9,14:16,19:21,24:27)],poa_norm_select)
+poa.df$SexSize<-paste0(poa.df$Sex," ",poa.df$Relative.Size)
+
+
+
+##These data are show similar patterns in Hormones and Behavior as the previous paper though less significance--no surprise it's a subsample
+##Patterns here also point to Large Females doing something different than other groups, but not enough power. Most often seeing sex effect.
+```
+
+###piecewise SEM model Approach--Prediction 4
+###Now with can do a path analysis to account for variation as we move through the hormone synthesis all the way to the receptors
+###Note we can now account for all variables, but effects are assumed to be one-directional
+###First model assumes upstream features directly affect the next step in hormone path (e.g. T-->aromatase)
+```{r}
+poa.df2<-data.frame(poa.df[,1:11],scale(poa.df[,12:23]),poa.df[,24])
+
+appsem1.poa<-psem(glm(hsd17b4~Pr,family="gaussian",data=poa.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=poa.df2),glm(arb~T+hsd11b2+X11KT+hsd17b4,family="gaussian",data=poa.df2),glm(ara~T+hsd11b2+X11KT+hsd17b4,family="gaussian",data=poa.df2),glm(cyp19a1b~T+hsd17b4,family="gaussian",poa.df2),glm(esr1~E2+cyp19a1b,family="gaussian",poa.df2),glm(esr2a~cyp19a1b+E2,family="gaussian",poa.df2),glm(esr2b~cyp19a1b+E2,family="gaussian",poa.df2),glm(App~ara+arb+esr1+esr2a+esr2b,family="poisson",poa.df2),data=poa.df2)
+summary(appsem1.poa)
+
+## Model doesn't account for all direct relationships. Add those in and see if model improves
+
+appsem2.poa<-psem(glm(hsd17b4~Pr+T,family="gaussian",data=poa.df2),glm(hsd11b2~hsd17b4+T+X11KT,family="gaussian",data=poa.df2),glm(arb~T+hsd11b2+X11KT+hsd17b4+Pr,family="gaussian",data=poa.df2),glm(ara~T+hsd11b2+hsd17b4+X11KT,family="gaussian",data=poa.df2),glm(cyp19a1b~T+hsd17b4+ara,family="gaussian",poa.df2),glm(esr1~E2+cyp19a1b,family="gaussian",poa.df2),glm(esr2a~cyp19a1b+E2,family="gaussian",poa.df2),glm(esr2b~cyp19a1b+E2,family="gaussian",poa.df2),glm(App~ara+arb+esr1+esr2a+esr2b+hsd11b2+T+Pr,family="poisson",poa.df2),data=poa.df2)
+summary(appsem2.poa)
+
+## Model does account for all direct relationships. Can make better, but we don't want to overfit the data (+ harder to explain with more connections)
+
+##Agrees with add/drop with ARa and ARb as both positive and ESR1, ESR2b and hsd11b2 as negative
+## Pr no longer involved
+
+appsem1.poa<-psem(glm(hsd17b4~Pr+T,family="gaussian",data=poa.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=poa.df2),glm(arb~T+hsd11b2+X11KT+hsd17b4+Pr+E2,family="gaussian",data=poa.df2),glm(ara~T+hsd11b2+X11KT+hsd17b4+E2,family="gaussian",data=poa.df2),glm(cyp19a1b~T+hsd17b4,family="gaussian",poa.df2),glm(esr1~E2+cyp19a1b,family="gaussian",poa.df2),glm(esr2a~cyp19a1b+E2,family="gaussian",poa.df2),glm(esr2b~cyp19a1b+E2,family="gaussian",poa.df2),glm(App~ara+arb+esr1+esr2a+esr2b+Pr+T+hsd17b4+hsd11b2,family="poisson",poa.df2),data=poa.df2)
+summary(appsem1.poa)
+
+
+```
+
+###piecewise SEM model Out of Nest
+```{r}
+poa.df2$outs<-asin(poa.df2$Out/1200)
+outsem1.poa<-psem(glm(hsd17b4~Pr,family="gaussian",data=poa.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=poa.df2),glm(arb~T+hsd11b2+X11KT+hsd17b4,family="gaussian",data=poa.df2),glm(ara~T+hsd11b2+X11KT+hsd17b4,family="gaussian",data=poa.df2),glm(cyp19a1b~T+hsd17b4,family="gaussian",poa.df2),glm(esr1~E2+cyp19a1b,family="gaussian",poa.df2),glm(esr2a~cyp19a1b+E2,family="gaussian",poa.df2),glm(esr2b~cyp19a1b+E2,family="gaussian",poa.df2),glm(outs~ara+arb+esr1+esr2a+esr2b,family="gaussian",poa.df2),data=poa.df2)
+summary(outsem1.poa)
+
+outsem2.poa<-psem(glm(hsd17b4~Pr+T,family="gaussian",data=poa.df2),glm(hsd11b2~hsd17b4+T+X11KT,family="gaussian",data=poa.df2),glm(arb~T+hsd11b2+X11KT+Pr+hsd17b4,family="gaussian",data=poa.df2),glm(ara~T+hsd11b2+X11KT+hsd17b4,family="gaussian",data=poa.df2),glm(cyp19a1b~T+hsd17b4+ara,family="gaussian",poa.df2),glm(esr1~E2+cyp19a1b,family="gaussian",poa.df2),glm(esr2a~cyp19a1b+E2,family="gaussian",poa.df2),glm(esr2b~cyp19a1b+E2,family="gaussian",poa.df2),glm(outs~ara+arb+esr1+esr2a+esr2b,family="gaussian",poa.df2),data=poa.df2)
+summary(outsem2.poa)
+
+##All upstream paths are the same (as they should be)
+##ARa is negative while ARb and ESR2b are + (p < 0.1) which agrees with add/drop method (though ESR2b is sig in that version)
+```
+
+###piecewise SEM model Shimmy
+```{r}
+shimsem1.poa<-psem(glm(hsd17b4~Pr,family="gaussian",data=poa.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=poa.df2),glm(arb~T+hsd11b2+X11KT+hsd17b4,family="gaussian",data=poa.df2),glm(ara~T+hsd11b2+X11KT+hsd17b4,family="gaussian",data=poa.df2),glm(cyp19a1b~T+hsd17b4,family="gaussian",poa.df2),glm(esr1~E2+cyp19a1b,family="gaussian",poa.df2),glm(esr2a~cyp19a1b+E2,family="gaussian",poa.df2),glm(esr2b~cyp19a1b+E2,family="gaussian",poa.df2),glm(Shim~ara+arb+esr1+esr2a+esr2b,family="poisson",poa.df2),data=poa.df2)
+summary(shimsem1.poa)
+
+shimsem2.poa<-psem(glm(hsd17b4~Pr+T,family="gaussian",data=poa.df2),glm(hsd11b2~hsd17b4+T+X11KT,family="gaussian",data=poa.df2),glm(arb~T+hsd11b2+X11KT+hsd17b4+Pr,family="gaussian",data=poa.df2),glm(ara~T+hsd11b2+X11KT+hsd17b4,family="gaussian",data=poa.df2),glm(cyp19a1b~T+hsd17b4+ara,family="gaussian",poa.df2),glm(esr1~E2+cyp19a1b,family="gaussian",poa.df2),glm(esr2a~cyp19a1b+E2,family="gaussian",poa.df2),glm(esr2b~cyp19a1b+E2,family="gaussian",poa.df2),glm(Shim~ara+arb+esr1+esr2a+esr2b+hsd11b2+E2+X11KT+T,family="poisson",poa.df2),data=poa.df2)
+summary(shimsem2.poa)
+
+
+```
+### Not sure how to visually represent path results in R plotting. Used coefficients x5 for line widths and made figure in Powerpoint
+
+
+###Repeat the whole process for OT. We don't expect much to happen here as it's an input to the decision making pathway. Kind of like a null model
+###OT
+```{r}
+####Extract OT samples
+jt_ot<-ac[,1:14]
+
+####Drop genes with samples with more than half having less than 10 reads
+dl<-c()
+for(i in 1:length(rownames(jt_ot)))
+{
+    genei<-jt_ot[i,]
+    if((count(genei>10)<7)=="TRUE")
+    {
+        dl<-c(dl,i)   
+    }
+}
+jt_ot<-jt_ot[-dl,]
+
+####Normalize read counts for NMDS
+jt_ot_norm<-vst(jt_ot)
+
+####Get coefficient of variation for each gene
+ot_coefv<-c()
+for(i in 1:length(rownames(jt_ot_norm)))
+{
+    genei<-jt_ot_norm[i,]
+    cvi<-100*(sd(genei)/mean(genei))
+    ot_coefv<-c(ot_coefv,cvi)   
+}
+
+####Select groupings based on most variation
+jt_ot_normtopk<-jt_ot_norm[order(-ot_coefv)[1:1000],]
+jt_ot_normtop1<-jt_ot_norm[order(-ot_coefv)[1:100],]
+jt_ot_normtop5<-jt_ot_norm[order(-ot_coefv)[1:500],]
+ot_pc_1k<-prcomp(scale(t(jt_ot_normtopk)))
+ot_pc_5c<-prcomp(scale(t(jt_ot_normtop5)))
+ot_pc_1c<-prcomp(scale(t(jt_ot_normtop1)))
+ot_pc_all<-prcomp(scale(t(jt_ot_norm)))
+```
+
+###Look for Outliers
+```{r}
+###Look for Outliers 1c
+d <- dist(t(jt_ot_normtop1))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_ot_normtop1), cex=.7)
+
+###No outliers
+
+###Look for Outliers 5c
+d <- dist(t(jt_ot_normtop5))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_ot_normtop5), cex=.7)
+
+###No outliers
+
+###Look for Outliers 1k
+d <- dist(t(jt_ot_normtopk))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_ot_normtopk), cex=.7)
+
+###No outliers
+```
+
+###Model selection OT
+```{r}
+pat_jtr<-GetPatterns(JT_Cond)
+JT_Cond<-c("FB","FB","FB","FS","FS","FS","FS","MB","MB","MB","MB","MS","MS","MS")
+###Normalization for EBSeq
+norm_jt_ot=MedianNorm(jt_ot)
+
+###Test of all fifteen models
+out_jt_ot=EBMultiTest(jt_ot,NgVector=NULL,Conditions=JT_Cond, AllParti= pat_jtr, sizeFactors=norm_jt_ot, maxround=100)
+
+###Get summary of models
+sumout_jt_ot=GetMultiPP(out_jt_ot)
+
+###Get list table of how many genes fall under each model
+table(sumout_jt_ot$MAP)
+table(sumout_jt_ot$MAP)[2:15]*100/(sum(table(sumout_jt_ot$MAP))-table(sumout_jt_ot$MAP)[1])
+sumout_jt_ot$Patterns
+
+
+###Sample for go_terms
+write.csv(names(sumout_jt_ot$MAP)[which(sumout_jt_ot$MAP == "pattern6")],"~/Desktop/JTR_xscript/goterm_search/ot_p6.csv")
+write.csv(names(sumout_jt_ot$MAP)[which(sumout_jt_ot$MAP == "pattern5")],"~/Desktop/JTR_xscript/goterm_search/ot_p5.csv")
+write.csv(names(sumout_jt_ot$MAP)[which(sumout_jt_ot$MAP == "pattern8")],"~/Desktop/JTR_xscript/goterm_search/ot_p8.csv")
+
+###Find the number of up and down regulated genes in each grouping
+xp_ot_p3<-jt_ot_norm[which(rownames(jt_ot_norm) %in% names(sumout_jt_ot$MAP)[which(sumout_jt_ot$MAP == "pattern3")]),]
+lmale<-apply(xp_ot_p3[,8:11],1,mean)
+other<-apply(xp_ot_p3[,c(1:7,12:14)],1,mean)
+print("p3")
+table(lmale-other>0)
+
+xp_ot_p5<-jt_ot_norm[which(rownames(jt_ot_norm) %in% names(sumout_jt_ot$MAP)[which(sumout_jt_ot$MAP == "pattern5")]),]
+sfemale<-apply(xp_ot_p5[,4:7],1,mean)
+other<-apply(xp_ot_p5[,c(1:3,8:14)],1,mean)
+print("p5")
+table(sfemale-other>0)
+
+xp_ot_p6<-jt_ot_norm[which(rownames(jt_ot_norm) %in% names(sumout_jt_ot$MAP)[which(sumout_jt_ot$MAP == "pattern6")]),]
+big<-apply(xp_ot_p6[,c(1:3,8:11)],1,mean)
+small<-apply(xp_ot_p6[,c(4:7,11:14)],1,mean)
+print("p6")
+table(big-small>0)
+
+xp_ot_p8<-jt_ot_norm[which(rownames(jt_ot_norm) %in% names(sumout_jt_ot$MAP)[which(sumout_jt_ot$MAP == "pattern8")]),]
+lfemale<-apply(xp_ot_p8[,1:3],1,mean)
+other<-apply(xp_ot_p8[,c(4:14)],1,mean)
+print("p8")
+table(lfemale-other>0)
+
+###Sample on just our target genes
+tar_gen_ot<-jt_ot[which(rownames(jt_ot) %in% gene_id_nb),]
+
+###Model work again
+out_jt_tar_ot=EBMultiTest(tar_gen_ot,NgVector=NULL,Conditions=JT_Cond, AllParti= pat_jtr, sizeFactors=norm_jt_ot, maxround=100)
+sumout_jt_tar_ot=GetMultiPP(out_jt_tar_ot)
+sumout_jt_tar_ot$MAP
+
+```
+
+
+####Imput Hormone Data Imput Hormone and behavior data for use in PATH analysis
+###Also, since no outliers removed, we can use this data to see how subsample changes previous findings
+```{r}
+ot_norm_select<-t(jt_ot_norm[which(rownames(jt_ot_norm) %in% gene_id_nb),])
+colnames(ot_norm_select)<-c("hsd11b2","hsd17b4","srd5a3","srd5a2a","srd5a1")
+ot.df<-data.frame(df[,c(1:4,9,14:16,19:21,24:27)],ot_norm_select)
+ot.df$SexSize<-paste0(ot.df$Sex," ",ot.df$Relative.Size)
+
+boxplot(asin(Out/1200)~Sex*Relative.Size,ot.df)
+boxplot(log(App+1)~Sex*Relative.Size,ot.df)
+boxplot(log(Shim+1)~Sex*Relative.Size,ot.df)
+boxplot(T~Sex*Relative.Size,ot.df)
+boxplot(X11KT~Sex*Relative.Size,ot.df)
+boxplot(E2~Sex*Relative.Size,ot.df)
+boxplot(Pr~Sex*Relative.Size,ot.df)
+
+out.an<-aov(asin(Out/1200)~Sex*Relative.Size,ot.df)
+app.an<-aov(log(App+1)~Sex*Relative.Size,ot.df)
+shim.an<-aov(log(Shim+1)~Sex*Relative.Size,ot.df)
+T.an<-aov(T~Sex*Relative.Size,ot.df)
+KT.an<-aov(X11KT~Sex*Relative.Size,ot.df)
+E.an<-aov(E2~Sex*Relative.Size,ot.df)
+Pr.an<-aov(Pr~Sex*Relative.Size,ot.df)
+
+summary(out.an)
+TukeyHSD(out.an)
+summary(app.an)
+TukeyHSD(app.an)
+summary(shim.an)
+TukeyHSD(shim.an)
+summary(T.an)
+TukeyHSD(T.an)
+summary(KT.an)
+TukeyHSD(KT.an)
+summary(E.an)
+TukeyHSD(E.an)
+summary(Pr.an)
+TukeyHSD(Pr.an)
+
+## Familiar looks to hormones and behaviors. No patterns in gene expression
+```
+
+
+###piecewise SEM model Approach
+```{r}
+ot.df2<-data.frame(ot.df[,1:11],scale(ot.df[,12:20]))
+appsem1.ot<-psem(glm(hsd17b4~Pr,family="gaussian",data=ot.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=ot.df2),glm(srd5a1~T+hsd17b4,family="gaussian",data=ot.df2),glm(srd5a2a~T+hsd17b4,family="gaussian",data=ot.df2),glm(srd5a3~T+hsd17b4,family="gaussian",data=ot.df2),glm(App~1,family="poisson",ot.df2),data=ot.df2)
+summary(appsem1.ot)
+
+## no significance anywhere
+```
+
+###piecewise SEM model Out of Nest
+```{r}
+ot.df2$outs<-asin(ot.df2$Out/1200)
+outsem1.ot<-psem(glm(hsd17b4~Pr,family="gaussian",data=ot.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=ot.df2),glm(srd5a1~T+hsd17b4,family="gaussian",data=ot.df2),glm(srd5a2a~T+hsd17b4,family="gaussian",data=ot.df2),glm(srd5a3~T+hsd17b4,family="gaussian",data=ot.df2),glm(outs~1,family="gaussian",ot.df2),data=ot.df2)
+summary(outsem1.ot)
+
+outsem2.ot<-psem(glm(hsd17b4~Pr,family="gaussian",data=ot.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=ot.df2),glm(srd5a1~T+hsd17b4,family="gaussian",data=ot.df2),glm(srd5a2a~T+hsd17b4,family="gaussian",data=ot.df2),glm(srd5a3~T+hsd17b4,family="gaussian",data=ot.df2),glm(outs~srd5a2a,family="gaussian",ot.df2),data=ot.df2)
+summary(outsem2.ot)
+
+## Upstream path correlations the same (no surprise)
+## No significant
+```
+
+
+###piecewise SEM model Shimmy
+```{r}
+shimsem1.ot<-psem(glm(hsd17b4~Pr,family="gaussian",data=ot.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=ot.df2),glm(srd5a1~T+hsd17b4,family="gaussian",data=ot.df2),glm(srd5a2a~T+hsd17b4,family="gaussian",data=ot.df2),glm(srd5a3~T+hsd17b4,family="gaussian",data=ot.df2),glm(Shim~1,family="poisson",ot.df2),data=ot.df2)
+summary(shimsem1.ot)
+
+shimsem2.ot<-psem(glm(hsd17b4~Pr,family="gaussian",data=ot.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=ot.df2),glm(srd5a1~T+hsd17b4,family="gaussian",data=ot.df2),glm(srd5a2a~T+hsd17b4,family="gaussian",data=ot.df2),glm(srd5a3~T+hsd17b4,family="gaussian",data=ot.df2),glm(Shim~hsd17b4,family="poisson",ot.df2),data=ot.df2)
+summary(shimsem2.ot)
+
+shimsem3.ot<-psem(glm(hsd17b4~Pr,family="gaussian",data=ot.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=ot.df2),glm(srd5a1~T+hsd17b4,family="gaussian",data=ot.df2),glm(srd5a2a~T+hsd17b4,family="gaussian",data=ot.df2),glm(srd5a3~T+hsd17b4,family="gaussian",data=ot.df2),glm(Shim~hsd17b4+Pr+srd5a1+srd5a2a+srd5a3,family="poisson",ot.df2),data=ot.df2)
+summary(shimsem3.ot)
+
+```
+
+
+###Vd
+```{r}
+jt_vd<-ac[,29:42]
+dl<-c()
+for(i in 1:length(rownames(jt_vd)))
+{
+    genei<-jt_vd[i,]
+    if((count(genei>10)<7)=="TRUE")
+    {
+        dl<-c(dl,i)   
+    }
+}
+jt_vd<-jt_vd[-dl,]
+####Normalize read counts for PCA
+jt_vd_norm<-vst(jt_vd)
+
+####Get coefficient of variation for each gene
+vd_coefv<-c()
+for(i in 1:length(rownames(jt_vd_norm)))
+{
+    genei<-jt_vd_norm[i,]
+    cvi<-100*(sd(genei)/mean(genei))
+    vd_coefv<-c(vd_coefv,cvi)   
+}
+
+####Select groupings based on most variation
+jt_vd_normtopk<-jt_vd_norm[order(-vd_coefv)[1:1000],]
+jt_vd_normtop1<-jt_vd_norm[order(-vd_coefv)[1:100],]
+jt_vd_normtop5<-jt_vd_norm[order(-vd_coefv)[1:500],]
+vd_pc_1k<-prcomp(scale(t(jt_vd_normtopk)))
+vd_pc_5c<-prcomp(scale(t(jt_vd_normtop5)))
+vd_pc_1c<-prcomp(scale(t(jt_vd_normtop1)))
+vd_pc_all<-prcomp(scale(t(jt_vd_norm)))
+
+```
+
+
+```{r}
+###Look for Outliers
+d <- dist(t(jt_vd_normtop1))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_vd_normtop1), cex=.7)
+
+###Female Big 3 and Male Big 2 are outlier, Female small 1 is but Female small 2 is reasonably close
+d <- dist(t(jt_vd_normtop1[,c(1,2,4:8,10:14)]))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_vd_normtop1)[c(1,2,4:8,10:14)], cex=.7)
+
+###Look for Outliers
+d <- dist(t(jt_vd_normtop5))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_vd_normtop1), cex=.7)
+
+###Female big 3 is definitely an outlier, but now female small 2 is getting farther away. Male big 2 less out
+d <- dist(t(jt_vd_normtop5[,c(1,2,5:14)]))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_vd_normtop5[,c(1,2,5:14)]), cex=.7)
+## Now male big 2 getting out a bit
+
+###Look for Outliers
+d <- dist(t(jt_vd_normtopk))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_vd_normtopk), cex=.7)
+
+###Female Big 3 and Female small 1 are outliers, male big 2 looking a little better
+d <- dist(t(jt_vd_normtopk[,c(1,2,5:14)]))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_vd_normtopk[,c(1,2,5:14)]), cex=.7)
+```
+## Dropping Female Big 3. Iterations with Female Small 1 and/or Male Big 2 leaves them as outlier so dropping them too.
+```{r}
+jt_vd<-ac[,c(29,30,33:36,38:42)]
+dl<-c()
+for(i in 1:length(rownames(jt_vd)))
+{
+    genei<-jt_vd[i,]
+    if((count(genei>10)<5)=="TRUE")
+    {
+        dl<-c(dl,i)   
+    }
+}
+jt_vd<-jt_vd[-dl,]
+####Normalize read counts for PCA
+jt_vd_norm<-vst(jt_vd)
+
+####Get coefficient of variation for each gene
+vd_coefv<-c()
+for(i in 1:length(rownames(jt_vd_norm)))
+{
+    genei<-jt_vd_norm[i,]
+    cvi<-100*(sd(genei)/mean(genei))
+    vd_coefv<-c(vd_coefv,cvi)   
+}
+
+####Select groupings based on most variation
+jt_vd_normtopk<-jt_vd_norm[order(-vd_coefv)[1:1000],]
+jt_vd_normtop1<-jt_vd_norm[order(-vd_coefv)[1:100],]
+jt_vd_normtop5<-jt_vd_norm[order(-vd_coefv)[1:500],]
+vd_pc_1k<-prcomp(scale(t(jt_vd_normtopk)))
+vd_pc_5c<-prcomp(scale(t(jt_vd_normtop5)))
+vd_pc_1c<-prcomp(scale(t(jt_vd_normtop1)))
+vd_pc_all<-prcomp(scale(t(jt_vd_norm)))
+
+```
+
+###Recheck for Outliers
+```{r}
+###Look for Outliers 1c
+d <- dist(t(jt_vd_normtop1))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_vd_normtop1), cex=.7)
+
+###Look for Outliers 5c
+d <- dist(t(jt_vd_normtop5))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_vd_normtop5), cex=.7)
+
+###Look for Outliers 1k
+d <- dist(t(jt_vd_normtopk))
+fit <- isoMDS(d, k=2)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Nonmetric MDS", type="n")
+text(x, y, labels = colnames(jt_vd_normtopk), cex=.7)
+```
+
+###Model selection Vd
+```{r}
+JT_Cond<-c("FB","FB","FS","FS","FS","MB","MB","MB","MS","MS","MS")
+pat_jtr<-GetPatterns(JT_Cond)
+
+###Normalization for EBSeq
+norm_jt_vd=MedianNorm(jt_vd)
+
+###Test of all fifteen models
+out_jt_vd=EBMultiTest(jt_vd,NgVector=NULL,Conditions=JT_Cond, AllParti= pat_jtr, sizeFactors=norm_jt_vd, maxround=100)
+
+###Get summary of models
+sumout_jt_vd=GetMultiPP(out_jt_vd)
+
+###Get list table of how many genes fall under each model
+table(sumout_jt_vd$MAP)
+table(sumout_jt_vd$MAP)[2:15]*100/(sum(table(sumout_jt_vd$MAP))-table(sumout_jt_vd$MAP)[1])
+sumout_jt_vd$Patterns
+
+
+###Sample for go_terms
+write.csv(names(sumout_jt_vd$MAP)[which(sumout_jt_vd$MAP == "pattern2")],"~/Desktop/JTR_xscript/goterm_search/vd_p2.csv")
+write.csv(names(sumout_jt_vd$MAP)[which(sumout_jt_vd$MAP == "pattern3")],"~/Desktop/JTR_xscript/goterm_search/vd_p3.csv")
+write.csv(names(sumout_jt_vd$MAP)[which(sumout_jt_vd$MAP == "pattern4")],"~/Desktop/JTR_xscript/goterm_search/vd_p4.csv")
+write.csv(names(sumout_jt_vd$MAP)[which(sumout_jt_vd$MAP == "pattern5")],"~/Desktop/JTR_xscript/goterm_search/vd_p5.csv")
+write.csv(names(sumout_jt_vd$MAP)[which(sumout_jt_vd$MAP == "pattern8")],"~/Desktop/JTR_xscript/goterm_search/vd_p8.csv")
+
+###Find the number of up and down regulated genes in each grouping
+xp_vd_p2<-jt_vd_norm[which(rownames(jt_vd_norm) %in% names(sumout_jt_vd$MAP)[which(sumout_jt_vd$MAP == "pattern3")]),]
+smale<-apply(xp_vd_p2[,9:11],1,mean)
+other<-apply(xp_vd_p2[,c(1:8)],1,mean)
+print("p2")
+table(smale-other>0)
+
+xp_vd_p3<-jt_vd_norm[which(rownames(jt_vd_norm) %in% names(sumout_jt_vd$MAP)[which(sumout_jt_vd$MAP == "pattern3")]),]
+lmale<-apply(xp_vd_p3[,6:8],1,mean)
+other<-apply(xp_vd_p3[,c(1:5,9:11)],1,mean)
+print("p3")
+table(lmale-other>0)
+
+xp_vd_p4<-jt_vd_norm[which(rownames(jt_vd_norm) %in% names(sumout_jt_vd$MAP)[which(sumout_jt_vd$MAP == "pattern4")]),]
+male<-apply(xp_vd_p4[,6:11],1,mean)
+female<-apply(xp_vd_p4[,c(1:5)],1,mean)
+print("p4")
+table(male-female>0)
+
+xp_vd_p5<-jt_vd_norm[which(rownames(jt_vd_norm) %in% names(sumout_jt_vd$MAP)[which(sumout_jt_vd$MAP == "pattern5")]),]
+sfemale<-apply(xp_vd_p5[,3:5],1,mean)
+other<-apply(xp_vd_p5[,c(1:2,6:11)],1,mean)
+print("p5")
+table(sfemale-other>0)
+
+xp_vd_p6<-jt_vd_norm[which(rownames(jt_vd_norm) %in% names(sumout_jt_vd$MAP)[which(sumout_jt_vd$MAP == "pattern6")]),]
+big<-apply(xp_vd_p6[,c(1:2,6:8)],1,mean)
+small<-apply(xp_vd_p6[,c(3:5,9:11)],1,mean)
+print("p6")
+table(big-small>0)
+
+xp_vd_p8<-jt_vd_norm[which(rownames(jt_vd_norm) %in% names(sumout_jt_vd$MAP)[which(sumout_jt_vd$MAP == "pattern8")]),]
+lfemale<-apply(xp_vd_p8[,1:2],1,mean)
+other<-apply(xp_vd_p8[,c(3:11)],1,mean)
+print("p8")
+table(lfemale-other>0)
+
+sfemale<-apply(log2(tar_gen_poa[,3:5]+0.01),1,mean)
+other<-apply(log2(tar_gen_poa[,c(1:2,6:11)]+0.01),1,mean)
+print("p5_target")
+data.frame(sfemale,other)
+
+###Sample on just our target genes
+tar_gen_vd<-jt_vd[which(rownames(jt_vd) %in% gene_id_nb),]
+
+###Model work again
+out_jt_tar_vd=EBMultiTest(tar_gen_vd,NgVector=NULL,Conditions=JT_Cond , AllParti= pat_jtr, sizeFactors=norm_jt_vd, maxround=100)
+sumout_jt_tar_vd=GetMultiPP(out_jt_tar_vd)
+sumout_jt_tar_vd$MAP
+```
+
+####Imput Hormone Data Imput Hormone and behavior data for use in PATH analysis
+```{r}
+vd_norm_select<-t(jt_vd_norm[which(rownames(jt_vd_norm) %in% gene_id_nb),])
+colnames(vd_norm_select)<-c("hsd11b2","ara","esr2b","cyp19a1b","hsd17b4","esr1","esr2a","arb","srd5a1")
+vd.df<-data.frame(df[c(1,2,5:8,10:14),c(1:4,9,14:16,19:21,24:27)],vd_norm_select)
+vd.df$SexSize<-paste0(vd.df$Sex," ",vd.df$Relative.Size)
+
+```
+
+###piecewise SEM model Approach
+```{r}
+vd.df2<-data.frame(vd.df[,1:11],scale(vd.df[,12:24]))
+appsem1.vd<-psem(glm(hsd17b4~Pr,family="gaussian",data=vd.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=vd.df2),glm(srd5a1~hsd17b4+T,family="gaussian",vd.df2),glm(arb~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(ara~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(cyp19a1b~T+hsd17b4,family="gaussian",vd.df2),glm(esr1~E2+cyp19a1b,family="gaussian",vd.df2),glm(esr2a~cyp19a1b+E2,family="gaussian",vd.df2),glm(esr2b~cyp19a1b+E2,family="gaussian",vd.df2),glm(App~ara+arb+esr1+esr2a+esr2b,family="poisson",vd.df2),data=vd.df2)
+summary(appsem1.vd)
+
+appsem2.vd<-psem(glm(hsd17b4~Pr,family="gaussian",data=vd.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=vd.df2),glm(srd5a1~hsd17b4+T,family="gaussian",vd.df2),glm(arb~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(ara~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(cyp19a1b~T+hsd17b4+ara,family="gaussian",vd.df2),glm(esr1~E2+cyp19a1b+hsd17b4,family="gaussian",vd.df2),glm(esr2a~cyp19a1b+E2,family="gaussian",vd.df2),glm(esr2b~cyp19a1b+E2,family="gaussian",vd.df2),glm(App~ara+arb+esr1+esr2a+esr2b+hsd17b4,family="poisson",vd.df2),data=vd.df2)
+summary(appsem2.vd)
+
+appsem3.vd<-psem(glm(hsd17b4~Pr,family="gaussian",data=vd.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=vd.df2),glm(srd5a1~hsd17b4+T,family="gaussian",vd.df2),glm(arb~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(ara~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(cyp19a1b~T+hsd17b4+ara+Pr,family="gaussian",vd.df2),glm(esr1~E2+cyp19a1b+hsd17b4+Pr,family="gaussian",vd.df2),glm(esr2a~cyp19a1b+E2,family="gaussian",vd.df2),glm(esr2b~cyp19a1b+E2,family="gaussian",vd.df2),glm(App~ara+arb+esr1+esr2a+esr2b+hsd17b4,family="poisson",vd.df2),data=vd.df2)
+summary(appsem3.vd)
+
+```
+
+###piecewise SEM model Shimmy
+```{r}
+shimsem1.vd<-psem(glm(hsd17b4~Pr,family="gaussian",data=vd.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=vd.df2),glm(srd5a1~hsd17b4+T,family="gaussian",vd.df2),glm(arb~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(ara~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(cyp19a1b~T+hsd17b4,family="gaussian",vd.df2),glm(esr1~E2+cyp19a1b,family="gaussian",vd.df2),glm(esr2a~cyp19a1b+E2,family="gaussian",vd.df2),glm(esr2b~cyp19a1b+E2,family="gaussian",vd.df2),glm(Shim~ara+arb+esr1+esr2a+esr2b,family="poisson",vd.df2),data=vd.df2)
+summary(shimsem1.vd)
+
+shimsem2.vd<-psem(glm(hsd17b4~Pr,family="gaussian",data=vd.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=vd.df2),glm(srd5a1~hsd17b4+T,family="gaussian",vd.df2),glm(arb~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(ara~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(cyp19a1b~T+hsd17b4+ara,family="gaussian",vd.df2),glm(esr1~E2+cyp19a1b+hsd17b4,family="gaussian",vd.df2),glm(esr2a~cyp19a1b+E2,family="gaussian",vd.df2),glm(esr2b~cyp19a1b+E2,family="gaussian",vd.df2),glm(Shim~ara+arb+esr1+esr2a+esr2b+hsd17b4,family="poisson",vd.df2),data=vd.df2)
+summary(shimsem2.vd)
+
+shimsem3.vd<-psem(glm(hsd17b4~Pr,family="gaussian",data=vd.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=vd.df2),glm(srd5a1~hsd17b4+T,family="gaussian",vd.df2),glm(arb~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(ara~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(cyp19a1b~T+hsd17b4+ara+Pr,family="gaussian",vd.df2),glm(esr1~E2+cyp19a1b+hsd17b4+Pr,family="gaussian",vd.df2),glm(esr2a~cyp19a1b+E2,family="gaussian",vd.df2),glm(esr2b~cyp19a1b+E2,family="gaussian",vd.df2),glm(Shim~ara+arb+esr1+esr2a+esr2b+hsd17b4+hsd11b2,family="poisson",vd.df2),data=vd.df2)
+summary(shimsem3.vd)
+
+```
+
+###piecewise SEM model Out
+```{r}
+vd.df2$outs<-asin(vd.df2$Out/1200)
+outsem1.vd<-psem(glm(hsd17b4~Pr,family="gaussian",data=vd.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=vd.df2),glm(srd5a1~hsd17b4+T,family="gaussian",vd.df2),glm(arb~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(ara~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(cyp19a1b~T+hsd17b4,family="gaussian",vd.df2),glm(esr1~E2+cyp19a1b,family="gaussian",vd.df2),glm(esr2a~cyp19a1b+E2,family="gaussian",vd.df2),glm(esr2b~cyp19a1b+E2,family="gaussian",vd.df2),glm(outs~ara+arb+esr1+esr2a+esr2b,family="gaussian",vd.df2),data=vd.df2)
+summary(outsem1.vd)
+
+outsem2.vd<-psem(glm(hsd17b4~Pr,family="gaussian",data=vd.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=vd.df2),glm(srd5a1~hsd17b4+T,family="gaussian",vd.df2),glm(arb~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(ara~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(cyp19a1b~T+hsd17b4+ara,family="gaussian",vd.df2),glm(esr1~E2+cyp19a1b+hsd17b4,family="gaussian",vd.df2),glm(esr2a~cyp19a1b+E2,family="gaussian",vd.df2),glm(esr2b~cyp19a1b+E2,family="gaussian",vd.df2),glm(outs~ara+arb+esr1+esr2a+esr2b,family="gaussian",vd.df2),data=vd.df2)
+summary(outsem2.vd)
+
+outsem3.vd<-psem(glm(hsd17b4~Pr,family="gaussian",data=vd.df2),glm(hsd11b2~hsd17b4+T,family="gaussian",data=vd.df2),glm(srd5a1~hsd17b4+T,family="gaussian",vd.df2),glm(arb~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(ara~T+hsd11b2+X11KT+srd5a1+hsd17b4,family="gaussian",data=vd.df2),glm(cyp19a1b~T+hsd17b4+ara+Pr,family="gaussian",vd.df2),glm(esr1~E2+cyp19a1b+hsd17b4+Pr,family="gaussian",vd.df2),glm(esr2a~cyp19a1b+E2,family="gaussian",vd.df2),glm(esr2b~cyp19a1b+E2,family="gaussian",vd.df2),glm(outs~ara+arb+esr1+esr2a+esr2b,family="gaussian",vd.df2),data=vd.df2)
+summary(outsem3.vd)
+
+```
+
+###Generate Heatmaps of Posterior probabilities
+```{r}
+library(viridis)
+library(pheatmap)
+
+###This approach tried to make a large dataset of all three brain regions--proved to be cumbersome
+###Take each PP values for every female larger grouping gene for POA
+###Column reorder is by Size, Sex, FL, ML, FS, MS
+p8_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% names(sumout_jt_poa$MAP[which(sumout_jt_poa$MAP == "pattern8")])),c(6,4,8,3,5,2)])
+###Order by gene name for column merge
+p8_poa<-p8_poa[order(rownames(p8_poa)),]
+###Find the POA p8 pattern genes in Vd
+p8_poa_n_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% rownames(p8_poa)),c(6,4,8,3,5,2)])
+###Find the POA p8 pattern genes in OT
+p8_poa_n_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% rownames(p8_poa)),c(6,4,8,3,5,2)])
+###Merge with Vd
+p8_poa_all<-merge(p8_poa,p8_poa_n_vd,by="row.names",all=TRUE)
+###Extract rownames columns
+row.names(p8_poa_all)<-p8_poa_all$Row.names
+p8_poa_all<-p8_poa_all[,2:13]
+###Merge with OT
+p8_poa_all<-merge(p8_poa_all,p8_poa_n_ot,by="row.names",all=TRUE)
+###Extract rownames columns
+row.names(p8_poa_all)<-p8_poa_all$Row.names
+p8_poa_all<-p8_poa_all[,2:19]
+
+###Repeat for each grouping
+p6_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% names(sumout_jt_poa$MAP[which(sumout_jt_poa$MAP == "pattern6")])),c(6,4,8,3,5,2)])
+p6_poa<-p6_poa[order(rownames(p6_poa)),]
+p6_poa_n_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% rownames(p6_poa)),c(6,4,8,3,5,2)])
+p6_poa_n_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% rownames(p6_poa)),c(6,4,8,3,5,2)])
+p6_poa_all<-merge(p6_poa,p6_poa_n_vd,by="row.names",all=TRUE)
+row.names(p6_poa_all)<-p6_poa_all$Row.names
+p6_poa_all<-p6_poa_all[,2:13]
+p6_poa_all<-merge(p6_poa_all,p6_poa_n_ot,by="row.names",all=TRUE)
+row.names(p6_poa_all)<-p6_poa_all$Row.names
+p6_poa_all<-p6_poa_all[,2:19]
+
+p5_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% names(sumout_jt_poa$MAP[which(sumout_jt_poa$MAP == "pattern5")])),c(6,4,8,3,5,2)])
+p5_poa<-p5_poa[order(rownames(p5_poa)),]
+p5_poa_n_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% rownames(p5_poa)),c(6,4,8,3,5,2)])
+p5_poa_n_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% rownames(p5_poa)),c(6,4,8,3,5,2)])
+p5_poa_all<-merge(p5_poa,p5_poa_n_vd,by="row.names",all=TRUE)
+row.names(p5_poa_all)<-p5_poa_all$Row.names
+p5_poa_all<-p5_poa_all[,2:13]
+p5_poa_all<-merge(p5_poa_all,p5_poa_n_ot,by="row.names",all=TRUE)
+row.names(p5_poa_all)<-p5_poa_all$Row.names
+p5_poa_all<-p5_poa_all[,2:19]
+
+p4_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% names(sumout_jt_poa$MAP[which(sumout_jt_poa$MAP == "pattern4")])),c(6,4,8,3,5,2)])
+p4_poa<-p4_poa[order(rownames(p4_poa)),]
+p4_poa_n_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% rownames(p4_poa)),c(6,4,8,3,5,2)])
+p4_poa_n_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% rownames(p4_poa)),c(6,4,8,3,5,2)])
+p4_poa_all<-merge(p4_poa,p4_poa_n_vd,by="row.names",all=TRUE)
+row.names(p4_poa_all)<-p4_poa_all$Row.names
+p4_poa_all<-p4_poa_all[,2:13]
+p4_poa_all<-merge(p4_poa_all,p4_poa_n_ot,by="row.names",all=TRUE)
+row.names(p4_poa_all)<-p4_poa_all$Row.names
+p4_poa_all<-p4_poa_all[,2:19]
+
+p3_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% names(sumout_jt_poa$MAP[which(sumout_jt_poa$MAP == "pattern3")])),c(6,4,8,3,5,2)])
+p3_poa<-p3_poa[order(rownames(p3_poa)),]
+p3_poa_n_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% rownames(p3_poa)),c(6,4,8,3,5,2)])
+p3_poa_n_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% rownames(p3_poa)),c(6,4,8,3,5,2)])
+p3_poa_all<-merge(p3_poa,p3_poa_n_vd,by="row.names",all=TRUE)
+row.names(p3_poa_all)<-p3_poa_all$Row.names
+p3_poa_all<-p3_poa_all[,2:13]
+p3_poa_all<-merge(p3_poa_all,p3_poa_n_ot,by="row.names",all=TRUE)
+row.names(p3_poa_all)<-p3_poa_all$Row.names
+p3_poa_all<-p3_poa_all[,2:19]
+
+p2_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% names(sumout_jt_poa$MAP[which(sumout_jt_poa$MAP == "pattern2")])),c(6,4,8,3,5,2)])
+p2_poa<-p2_poa[order(rownames(p2_poa)),]
+p2_poa_n_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% rownames(p2_poa)),c(6,4,8,3,5,2)])
+p2_poa_n_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% rownames(p2_poa)),c(6,4,8,3,5,2)])
+p2_poa_all<-merge(p2_poa,p2_poa_n_vd,by="row.names",all=TRUE)
+row.names(p2_poa_all)<-p2_poa_all$Row.names
+p2_poa_all<-p2_poa_all[,2:13]
+p2_poa_all<-merge(p2_poa_all,p2_poa_n_ot,by="row.names",all=TRUE)
+row.names(p2_poa_all)<-p2_poa_all$Row.names
+p2_poa_all<-p2_poa_all[,2:19]
+
+p8_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% names(sumout_jt_ot$MAP[which(sumout_jt_ot$MAP == "pattern8")])),c(6,4,8,3,5,2)])
+p8_ot<-p8_ot[order(rownames(p8_ot)),]
+p8_ot_n_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% rownames(p8_ot)),c(6,4,8,3,5,2)])
+p8_ot_n_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% rownames(p8_ot)),c(6,4,8,3,5,2)])
+p8_ot_all<-merge(p8_ot_n_poa,p8_ot_n_vd,by="row.names",all=TRUE)
+row.names(p8_ot_all)<-p8_ot_all$Row.names
+p8_ot_all<-p8_ot_all[,2:13]
+p8_ot_all<-merge(p8_ot_all,p8_ot,by="row.names",all=TRUE)
+row.names(p8_ot_all)<-p8_ot_all$Row.names
+p8_ot_all<-p8_ot_all[,2:19]
+
+p6_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% names(sumout_jt_ot$MAP[which(sumout_jt_ot$MAP == "pattern6")])),c(6,4,8,3,5,2)])
+p6_ot<-p6_ot[order(rownames(p6_ot)),]
+p6_ot_n_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% rownames(p6_ot)),c(6,4,8,3,5,2)])
+p6_ot_n_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% rownames(p6_ot)),c(6,4,8,3,5,2)])
+p6_ot_all<-merge(p6_ot_n_poa,p6_ot_n_vd,by="row.names",all=TRUE)
+row.names(p6_ot_all)<-p6_ot_all$Row.names
+p6_ot_all<-p6_ot_all[,2:13]
+p6_ot_all<-merge(p6_ot_all,p6_ot,by="row.names",all=TRUE)
+row.names(p6_ot_all)<-p6_ot_all$Row.names
+p6_ot_all<-p6_ot_all[,2:19]
+
+p5_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% names(sumout_jt_ot$MAP[which(sumout_jt_ot$MAP == "pattern5")])),c(6,4,8,3,5,2)])
+p5_ot<-p5_ot[order(rownames(p5_ot)),]
+p5_ot_n_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% rownames(p5_ot)),c(6,4,8,3,5,2)])
+p5_ot_n_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% rownames(p5_ot)),c(6,4,8,3,5,2)])
+p5_ot_all<-merge(p5_ot_n_poa,p5_ot_n_vd,by="row.names",all=TRUE)
+row.names(p5_ot_all)<-p5_ot_all$Row.names
+p5_ot_all<-p5_ot_all[,2:13]
+p5_ot_all<-merge(p5_ot_all,p5_ot,by="row.names",all=TRUE)
+row.names(p5_ot_all)<-p5_ot_all$Row.names
+p5_ot_all<-p5_ot_all[,2:19]
+
+p4_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% names(sumout_jt_ot$MAP[which(sumout_jt_ot$MAP == "pattern4")])),c(6,4,8,3,5,2)])
+p4_ot<-p4_ot[order(rownames(p4_ot)),]
+p4_ot_n_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% rownames(p4_ot)),c(6,4,8,3,5,2)])
+p4_ot_n_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% rownames(p4_ot)),c(6,4,8,3,5,2)])
+p4_ot_all<-merge(p4_ot_n_poa,p4_ot_n_vd,by="row.names",all=TRUE)
+row.names(p4_ot_all)<-p4_ot_all$Row.names
+p4_ot_all<-p4_ot_all[,2:13]
+p4_ot_all<-merge(p4_ot_all,p4_ot,by="row.names",all=TRUE)
+row.names(p4_ot_all)<-p4_ot_all$Row.names
+p4_ot_all<-p4_ot_all[,2:19]
+
+p3_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% names(sumout_jt_ot$MAP[which(sumout_jt_ot$MAP == "pattern3")])),c(6,4,8,3,5,2)])
+p3_ot<-p3_ot[order(rownames(p3_ot)),]
+p3_ot_n_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% rownames(p3_ot)),c(6,4,8,3,5,2)])
+p3_ot_n_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% rownames(p3_ot)),c(6,4,8,3,5,2)])
+p3_ot_all<-merge(p3_ot_n_poa,p3_ot_n_vd,by="row.names",all=TRUE)
+row.names(p3_ot_all)<-p3_ot_all$Row.names
+p3_ot_all<-p3_ot_all[,2:13]
+p3_ot_all<-merge(p3_ot_all,p3_ot,by="row.names",all=TRUE)
+row.names(p3_ot_all)<-p3_ot_all$Row.names
+p3_ot_all<-p3_ot_all[,2:19]
+
+p2_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% names(sumout_jt_ot$MAP[which(sumout_jt_ot$MAP == "pattern2")])),c(6,4,8,3,5,2)])
+p2_ot<-p2_ot[order(rownames(p2_ot)),]
+p2_ot_n_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% rownames(p2_ot)),c(6,4,8,3,5,2)])
+p2_ot_n_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% rownames(p2_ot)),c(6,4,8,3,5,2)])
+###just one hit need to get name
+which(rownames(sumout_jt_poa$PP) %in% rownames(p2_ot))
+### got row #
+p2_ot_n_poa<-t(data.frame(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% rownames(p2_ot)),c(6,4,8,3,5,2)]))
+### got as df now rename row
+rownames(p2_ot_n_poa)<-rownames(sumout_jt_poa$PP)[6618]
+p2_ot_all<-merge(p2_ot_n_poa,p2_ot_n_vd,by="row.names",all=TRUE)
+row.names(p2_ot_all)<-p2_ot_all$Row.names
+p2_ot_all<-p2_ot_all[,2:13]
+p2_ot_all<-merge(p2_ot_all,p2_ot,by="row.names",all=TRUE)
+row.names(p2_ot_all)<-p2_ot_all$Row.names
+p2_ot_all<-p2_ot_all[,2:19]
+
+p8_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% names(sumout_jt_vd$MAP[which(sumout_jt_vd$MAP == "pattern8")])),c(6,4,8,3,5,2)])
+p8_vd<-p8_vd[order(rownames(p8_vd)),]
+p8_vd_n_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% rownames(p8_vd)),c(6,4,8,3,5,2)])
+p8_vd_n_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% rownames(p8_vd)),c(6,4,8,3,5,2)])
+p8_vd_all<-merge(p8_vd_n_poa,p8_vd,by="row.names",all=TRUE)
+row.names(p8_vd_all)<-p8_vd_all$Row.names
+p8_vd_all<-p8_vd_all[,2:13]
+p8_vd_all<-merge(p8_vd_all,p8_vd_n_ot,by="row.names",all=TRUE)
+row.names(p8_vd_all)<-p8_vd_all$Row.names
+p8_vd_all<-p8_vd_all[,2:19]
+
+p6_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% names(sumout_jt_vd$MAP[which(sumout_jt_vd$MAP == "pattern6")])),c(6,4,8,3,5,2)])
+p6_vd<-p6_vd[order(rownames(p6_vd)),]
+p6_vd_n_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% rownames(p6_vd)),c(6,4,8,3,5,2)])
+p6_vd_n_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% rownames(p6_vd)),c(6,4,8,3,5,2)])
+p6_vd_all<-merge(p6_vd_n_poa,p6_vd,by="row.names",all=TRUE)
+row.names(p6_vd_all)<-p6_vd_all$Row.names
+p6_vd_all<-p6_vd_all[,2:13]
+p6_vd_all<-merge(p6_vd_all,p6_vd_n_ot,by="row.names",all=TRUE)
+row.names(p6_vd_all)<-p6_vd_all$Row.names
+p6_vd_all<-p6_vd_all[,2:19]
+
+p5_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% names(sumout_jt_vd$MAP[which(sumout_jt_vd$MAP == "pattern5")])),c(6,4,8,3,5,2)])
+p5_vd<-p5_vd[order(rownames(p5_vd)),]
+p5_vd_n_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% rownames(p5_vd)),c(6,4,8,3,5,2)])
+p5_vd_n_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% rownames(p5_vd)),c(6,4,8,3,5,2)])
+p5_vd_all<-merge(p5_vd_n_poa,p5_vd,by="row.names",all=TRUE)
+row.names(p5_vd_all)<-p5_vd_all$Row.names
+p5_vd_all<-p5_vd_all[,2:13]
+p5_vd_all<-merge(p5_vd_all,p5_vd_n_ot,by="row.names",all=TRUE)
+row.names(p5_vd_all)<-p5_vd_all$Row.names
+p5_vd_all<-p5_vd_all[,2:19]
+
+p4_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% names(sumout_jt_vd$MAP[which(sumout_jt_vd$MAP == "pattern4")])),c(6,4,8,3,5,2)])
+p4_vd<-p4_vd[order(rownames(p4_vd)),]
+p4_vd_n_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% rownames(p4_vd)),c(6,4,8,3,5,2)])
+p4_vd_n_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% rownames(p4_vd)),c(6,4,8,3,5,2)])
+p4_vd_all<-merge(p4_vd_n_poa,p4_vd,by="row.names",all=TRUE)
+row.names(p4_vd_all)<-p4_vd_all$Row.names
+p4_vd_all<-p4_vd_all[,2:13]
+p4_vd_all<-merge(p4_vd_all,p4_vd_n_ot,by="row.names",all=TRUE)
+row.names(p4_vd_all)<-p4_vd_all$Row.names
+p4_vd_all<-p4_vd_all[,2:19]
+
+p3_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% names(sumout_jt_vd$MAP[which(sumout_jt_vd$MAP == "pattern3")])),c(6,4,8,3,5,2)])
+p3_vd<-p3_vd[order(rownames(p3_vd)),]
+p3_vd_n_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% rownames(p3_vd)),c(6,4,8,3,5,2)])
+p3_vd_n_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% rownames(p3_vd)),c(6,4,8,3,5,2)])
+p3_vd_all<-merge(p3_vd_n_poa,p3_vd,by="row.names",all=TRUE)
+row.names(p3_vd_all)<-p3_vd_all$Row.names
+p3_vd_all<-p3_vd_all[,2:13]
+p3_vd_all<-merge(p3_vd_all,p3_vd_n_ot,by="row.names",all=TRUE)
+row.names(p3_vd_all)<-p3_vd_all$Row.names
+p3_vd_all<-p3_vd_all[,2:19]
+
+p2_vd<-(sumout_jt_vd$PP[which(rownames(sumout_jt_vd$PP) %in% names(sumout_jt_vd$MAP[which(sumout_jt_vd$MAP == "pattern2")])),c(6,4,8,3,5,2)])
+p2_vd<-p2_vd[order(rownames(p2_vd)),]
+p2_vd_n_ot<-(sumout_jt_ot$PP[which(rownames(sumout_jt_ot$PP) %in% rownames(p2_vd)),c(6,4,8,3,5,2)])
+p2_vd_n_poa<-(sumout_jt_poa$PP[which(rownames(sumout_jt_poa$PP) %in% rownames(p2_vd)),c(6,4,8,3,5,2)])
+p2_vd_all<-merge(p2_vd_n_poa,p2_vd,by="row.names",all=TRUE)
+row.names(p2_vd_all)<-p2_vd_all$Row.names
+p2_vd_all<-p2_vd_all[,2:13]
+p2_vd_all<-merge(p2_vd_all,p2_vd_n_ot,by="row.names",all=TRUE)
+row.names(p2_vd_all)<-p2_vd_all$Row.names
+p2_vd_all<-p2_vd_all[,2:19]
+
+###Making full dataset
+postmap<-rbind(p6_poa_all,p4_poa_all,p8_poa_all,p3_poa_all,p5_poa_all,p2_poa_all,p6_vd_all,p4_vd_all,p8_vd_all,p3_vd_all,p5_vd_all,p2_vd_all,p6_ot_all,p4_ot_all,p8_ot_all,p3_ot_all,p5_ot_all,p2_ot_all)
+postmap[is.na(postmap)] <- 0
+
+###Making region-specific database with other regions included. This means NAs will only be present on non-focal brain regions
+poa_postmap<-rbind(p6_poa_all,p4_poa_all,p8_poa_all,p3_poa_all,p5_poa_all,p2_poa_all)
+poa_postmapna<-poa_postmap
+poa_postmapna[is.na(poa_postmapna)] <- 0
+###Reorder to put group by patterns then brain regions
+poa_postmap_bypat<-poa_postmap[,c(1,7,13,2,8,14,3,9,15,4,10,16,5,11,17,6,12,18)]
+
+vd_postmap<-rbind(p6_vd_all,p4_vd_all,p8_vd_all,p3_vd_all,p5_vd_all,p2_vd_all)
+vd_postmapna<-vd_postmap
+vd_postmapna[is.na(vd_postmapna)] <- 0
+vd_postmap_bypat<-vd_postmap[,c(1,7,13,2,8,14,3,9,15,4,10,16,5,11,17,6,12,18)]
+
+ot_postmap<-rbind(p6_ot_all,p4_ot_all,p8_ot_all,p3_ot_all,p5_ot_all,p2_ot_all)
+ot_postmapna<-ot_postmap
+ot_postmapna[is.na(ot_postmapna)] <- 0
+
+ot_postmap_bypat<-ot_postmap[,c(1,7,13,2,8,14,3,9,15,4,10,16,5,11,17,6,12,18)]
+
+###Decided just to map each brain region on its own, so I pulled the columns from the brain region for plotting using the postmap (i.e. no N/As present)
+pheatmap(as.matrix(poa_postmap[,1:6]),color=turbo(100),cluster_cols=FALSE,dendrogram="none",show_rownames = FALSE,treeheight_row=0,labels_col = c("Size","Sex","Fem L","Male L", "Fem S","Male S"), legend_breaks = c(0, .20, .40, .6, .8, .99), main = "POA", cex=1.25,legend_labels = c("0", "0.2", "0.4", "0.6","0.8", "Posterior\nProbability"),border_color=NA)
+
+pheatmap(as.matrix(vd_postmap[,7:12]),color=turbo(100),cluster_cols=FALSE,dendrogram="none",show_rownames = FALSE,treeheight_row=0,labels_col = c("Size","Sex","Fem L","Male L", "Fem S","Male S"), legend_breaks = c(0, .20, .40, .6, .8, .99), main = "Vd", cex=1.25,legend_labels = c("0", "0.2", "0.4", "0.6","0.8", "Posterior\nProbability"),border_color=NA)
+
+pheatmap(as.matrix(ot_postmap[,13:18]),color=turbo(100),cluster_cols=FALSE,dendrogram="none",show_rownames = FALSE,treeheight_row=0,labels_col = c("Size","Sex","Fem L","Male L", "Fem S","Male S"), legend_breaks = c(0, .20, .40, .6, .8, .99), main = "OT", cex=1.25,legend_labels = c("0", "0.2", "0.4", "0.6","0.8", "Posterior\nProbability"),border_color=NA)
+
+###Now we do want to use our target genes. The clunky part above works great here
+tar_pp_poa<-sumout_jt_tar_poa$PP[order(rownames(sumout_jt_tar_poa$PP)),c(6,4,8,3,5,2)]
+tar_pp_ot<-sumout_jt_tar_ot$PP[order(rownames(sumout_jt_tar_ot$PP)),c(6,4,8,3,5,2)]
+tar_pp_vd<-sumout_jt_tar_vd$PP[order(rownames(sumout_jt_tar_vd$PP)),c(6,4,8,3,5,2)]
+tar_pp<-merge(tar_pp_poa,tar_pp_vd,by="row.names",all=TRUE)
+row.names(tar_pp)<-tar_pp$Row.names
+tar_pp<-tar_pp[,2:13]
+tar_pp<-merge(tar_pp,tar_pp_ot,by="row.names",all=TRUE)
+row.names(tar_pp)<-tar_pp$Row.names
+tar_pp<-tar_pp[,2:19]
+row.names(tar_pp)<-c("esr1","esr2a","hsd11b2","hsd17b4","ar2","srda5a2a","esr2b","cyp19a1b","ar1","srd5a1","srda3")
+tar_pp<-tar_pp[c(4,3,10,6,11,9,5,8,1,2,7),]
+
+pheatmap(as.matrix(tar_pp),color=turbo(100),cluster_cols=FALSE,cluster_rows=FALSE,dendrogram="none",show_rownames = TRUE,gaps_col=c(6,12),na_col="grey35",treeheight_row=0,labels_col = c("Size","Sex","Fem L","Male L", "Fem S","Male S","Size","Sex","Fem L","Male L", "Fem S","Male S","Size","Sex","Fem L","Male L", "Fem S","Male S"), legend_breaks = c(0, .20, .40, .6, .8, .99), main = "POA                        Vd                           OT",legend_labels = c("0", "0.2", "0.4", "0.6","0.8", "Posterior\nProbability"),cex=1.25,fontsize_row=7,border_color=NA)
+
+
+```
+
