@@ -3,7 +3,7 @@ Work on publication on cross-sexual transfer of female behavior based on size in
 
 Brain punch pictures and procedure are avialable upon request
 
-Reads are avialable on NCBI here:
+Reads are avialable on NCBI here: https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1417446
 QC_Reads contain quality checks after paired reads are passed through the default fastp pipeline
 
 Cleaned reads were uploaded onto IBest and had the following steps performed: Kraken2 for removal of non-eukaryotic reads, STAR alignment of reads to N_birchirdi, generate a table of read counts for upload to local computer and R work
