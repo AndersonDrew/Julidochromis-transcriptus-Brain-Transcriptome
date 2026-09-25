@@ -1,0 +1,592 @@
+	STAR --runThreadN 16 --runMode genomeGenerate --genomeDir refdir --genomeFastaFiles Nbri.fna --sjdbGTFfile genomic.gtf --sjdbOverhang 99 --genomeSAindexNbases 13
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 23 22:47:13 ..... started STAR run
+Apr 23 22:47:13 ... starting to generate Genome files
+Apr 23 22:47:32 ..... processing annotations GTF
+Apr 23 22:47:49 ... starting to sort Suffix Array. This may take a long time...
+Apr 23 22:47:58 ... sorting Suffix Array chunks and saving them to disk...
+Apr 23 22:49:36 ... loading chunks from disk, packing SA...
+Apr 23 22:49:53 ... finished generating suffix array
+Apr 23 22:50:11 ... generating Suffix Array index
+Apr 23 22:51:12 ... completed Suffix Array index
+Apr 23 22:51:12 ..... inserting junctions into the genome indices
+Apr 23 22:52:35 ... writing Genome to disk ...
+Apr 23 22:52:37 ... writing Suffix Array to disk ...
+Apr 23 22:52:42 ... writing SAindex to disk
+Apr 23 22:52:43 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/1V_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/1V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_V_M_Sm_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 23 22:52:43 ..... started STAR run
+Apr 23 22:52:43 ..... loading genome
+Apr 23 22:54:03 ..... started mapping
+Apr 23 22:59:59 ..... finished mapping
+Apr 23 23:00:00 ..... started sorting BAM
+Apr 23 23:00:21 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/2V_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/2V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_V_F_Big_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 23 23:00:21 ..... started STAR run
+Apr 23 23:00:21 ..... loading genome
+Apr 23 23:01:49 ..... started mapping
+Apr 23 23:05:35 ..... finished mapping
+Apr 23 23:05:36 ..... started sorting BAM
+Apr 23 23:05:43 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/3V_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/3V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_V_M_Big_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 23 23:05:44 ..... started STAR run
+Apr 23 23:05:44 ..... loading genome
+Apr 23 23:05:48 ..... started mapping
+Apr 23 23:13:54 ..... finished mapping
+Apr 23 23:13:54 ..... started sorting BAM
+Apr 23 23:14:21 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/4V_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/4V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_V_F_Big_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 23 23:14:22 ..... started STAR run
+Apr 23 23:14:22 ..... loading genome
+Apr 23 23:14:26 ..... started mapping
+Apr 23 23:19:26 ..... finished mapping
+Apr 23 23:19:27 ..... started sorting BAM
+Apr 23 23:19:42 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/5V_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/5V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_V_F_Sm_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 23 23:19:42 ..... started STAR run
+Apr 23 23:19:42 ..... loading genome
+Apr 23 23:19:46 ..... started mapping
+Apr 23 23:21:49 ..... finished mapping
+Apr 23 23:21:49 ..... started sorting BAM
+Apr 23 23:21:54 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/6V_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/6V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_V_M_Big_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 23 23:21:54 ..... started STAR run
+Apr 23 23:21:54 ..... loading genome
+Apr 23 23:21:58 ..... started mapping
+Apr 23 23:28:36 ..... finished mapping
+Apr 23 23:28:37 ..... started sorting BAM
+Apr 23 23:29:29 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/7V_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/7V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_V_F_Sm_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 23 23:29:30 ..... started STAR run
+Apr 23 23:29:30 ..... loading genome
+Apr 23 23:29:34 ..... started mapping
+Apr 23 23:31:47 ..... finished mapping
+Apr 23 23:31:47 ..... started sorting BAM
+Apr 23 23:31:53 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/8V_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/8V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_V_M_Sm_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 23 23:31:54 ..... started STAR run
+Apr 23 23:31:54 ..... loading genome
+Apr 23 23:31:57 ..... started mapping
+Apr 23 23:34:56 ..... finished mapping
+Apr 23 23:34:56 ..... started sorting BAM
+Apr 23 23:35:03 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/9V_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/9V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_V_M_Big_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 23 23:35:04 ..... started STAR run
+Apr 23 23:35:04 ..... loading genome
+Apr 23 23:35:07 ..... started mapping
+Apr 23 23:38:36 ..... finished mapping
+Apr 23 23:38:36 ..... started sorting BAM
+Apr 23 23:38:42 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/10V_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/10V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_V_F_Big_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 23 23:38:42 ..... started STAR run
+Apr 23 23:38:42 ..... loading genome
+Apr 23 23:38:46 ..... started mapping
+Apr 23 23:48:56 ..... finished mapping
+Apr 23 23:48:56 ..... started sorting BAM
+Apr 23 23:49:09 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/11V_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/11V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_V_M_Sm_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 23 23:49:09 ..... started STAR run
+Apr 23 23:49:09 ..... loading genome
+Apr 23 23:49:13 ..... started mapping
+Apr 23 23:55:17 ..... finished mapping
+Apr 23 23:55:17 ..... started sorting BAM
+Apr 23 23:55:25 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/12V_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/12V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_V_F_Sm_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 23 23:55:26 ..... started STAR run
+Apr 23 23:55:26 ..... loading genome
+Apr 23 23:55:30 ..... started mapping
+Apr 24 00:01:45 ..... finished mapping
+Apr 24 00:01:45 ..... started sorting BAM
+Apr 24 00:01:58 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/13V_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/13V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_V_F_Sm_4
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 00:01:58 ..... started STAR run
+Apr 24 00:01:58 ..... loading genome
+Apr 24 00:02:02 ..... started mapping
+Apr 24 00:06:00 ..... finished mapping
+Apr 24 00:06:01 ..... started sorting BAM
+Apr 24 00:06:24 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/14V_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/14V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_V_M_Big_4
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 00:06:25 ..... started STAR run
+Apr 24 00:06:25 ..... loading genome
+Apr 24 00:06:28 ..... started mapping
+Apr 24 00:12:18 ..... finished mapping
+Apr 24 00:12:19 ..... started sorting BAM
+Apr 24 00:12:41 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/15V_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/15V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_V_M_Sm_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 00:12:42 ..... started STAR run
+Apr 24 00:12:42 ..... loading genome
+Apr 24 00:12:45 ..... started mapping
+Apr 24 00:20:09 ..... finished mapping
+Apr 24 00:20:09 ..... started sorting BAM
+Apr 24 00:20:20 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/16V_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/16V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_V_F_Sm_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 00:20:20 ..... started STAR run
+Apr 24 00:20:20 ..... loading genome
+Apr 24 00:20:24 ..... started mapping
+Apr 24 00:28:46 ..... finished mapping
+Apr 24 00:28:46 ..... started sorting BAM
+Apr 24 00:29:18 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/17V_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/17V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_V_M_Big_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 00:29:19 ..... started STAR run
+Apr 24 00:29:19 ..... loading genome
+Apr 24 00:29:22 ..... started mapping
+Apr 24 00:36:23 ..... finished mapping
+Apr 24 00:36:24 ..... started sorting BAM
+Apr 24 00:36:56 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/18V_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/18V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_V_F_Big_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 00:36:57 ..... started STAR run
+Apr 24 00:36:57 ..... loading genome
+Apr 24 00:37:01 ..... started mapping
+Apr 24 00:44:59 ..... finished mapping
+Apr 24 00:45:00 ..... started sorting BAM
+Apr 24 00:45:07 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/19V_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/19V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_V_M_Sm_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 00:45:08 ..... started STAR run
+Apr 24 00:45:08 ..... loading genome
+Apr 24 00:45:12 ..... started mapping
+Apr 24 00:51:47 ..... finished mapping
+Apr 24 00:51:48 ..... started sorting BAM
+Apr 24 00:52:03 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/20V_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/20V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_V_M_Big_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 00:52:03 ..... started STAR run
+Apr 24 00:52:03 ..... loading genome
+Apr 24 00:52:07 ..... started mapping
+Apr 24 00:59:10 ..... finished mapping
+Apr 24 00:59:10 ..... started sorting BAM
+Apr 24 00:59:18 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/22V_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/22V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_V_F_Big_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 00:59:18 ..... started STAR run
+Apr 24 00:59:18 ..... loading genome
+Apr 24 00:59:22 ..... started mapping
+Apr 24 01:08:41 ..... finished mapping
+Apr 24 01:08:41 ..... started sorting BAM
+Apr 24 01:08:52 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/24V_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/24V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_V_F_Big_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 01:08:53 ..... started STAR run
+Apr 24 01:08:53 ..... loading genome
+Apr 24 01:08:57 ..... started mapping
+Apr 24 01:16:39 ..... finished mapping
+Apr 24 01:16:39 ..... started sorting BAM
+Apr 24 01:16:48 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/25V_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/25V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_V_F_Sm_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 01:16:49 ..... started STAR run
+Apr 24 01:16:49 ..... loading genome
+Apr 24 01:16:53 ..... started mapping
+Apr 24 01:24:24 ..... finished mapping
+Apr 24 01:24:25 ..... started sorting BAM
+Apr 24 01:24:32 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/26V_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/26V_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_V_F_Sm_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 01:24:33 ..... started STAR run
+Apr 24 01:24:33 ..... loading genome
+Apr 24 01:24:37 ..... started mapping
+Apr 24 01:31:48 ..... finished mapping
+Apr 24 01:31:48 ..... started sorting BAM
+Apr 24 01:31:57 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/1O_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/1O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_O_M_Sm_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 01:31:57 ..... started STAR run
+Apr 24 01:31:57 ..... loading genome
+Apr 24 01:32:01 ..... started mapping
+Apr 24 01:34:27 ..... finished mapping
+Apr 24 01:34:27 ..... started sorting BAM
+Apr 24 01:34:33 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/2O_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/2O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_O_F_Big_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 01:34:34 ..... started STAR run
+Apr 24 01:34:34 ..... loading genome
+Apr 24 01:34:37 ..... started mapping
+Apr 24 01:37:18 ..... finished mapping
+Apr 24 01:37:19 ..... started sorting BAM
+Apr 24 01:37:25 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/3O_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/3O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_O_M_Big_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 01:37:25 ..... started STAR run
+Apr 24 01:37:25 ..... loading genome
+Apr 24 01:37:29 ..... started mapping
+Apr 24 01:45:06 ..... finished mapping
+Apr 24 01:45:06 ..... started sorting BAM
+Apr 24 01:45:29 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/4O_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/4O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_O_F_Big_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 01:45:29 ..... started STAR run
+Apr 24 01:45:29 ..... loading genome
+Apr 24 01:45:33 ..... started mapping
+Apr 24 01:48:04 ..... finished mapping
+Apr 24 01:48:05 ..... started sorting BAM
+Apr 24 01:48:12 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/5O_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/5O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_O_F_Sm_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 01:48:13 ..... started STAR run
+Apr 24 01:48:13 ..... loading genome
+Apr 24 01:48:17 ..... started mapping
+Apr 24 01:55:01 ..... finished mapping
+Apr 24 01:55:02 ..... started sorting BAM
+Apr 24 01:55:16 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/6O_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/6O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_O_M_Big_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 01:55:16 ..... started STAR run
+Apr 24 01:55:16 ..... loading genome
+Apr 24 01:55:20 ..... started mapping
+Apr 24 01:59:32 ..... finished mapping
+Apr 24 01:59:33 ..... started sorting BAM
+Apr 24 01:59:43 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/7O_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/7O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_O_F_Sm_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 01:59:43 ..... started STAR run
+Apr 24 01:59:43 ..... loading genome
+Apr 24 01:59:47 ..... started mapping
+Apr 24 02:01:45 ..... finished mapping
+Apr 24 02:01:46 ..... started sorting BAM
+Apr 24 02:02:04 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/8O_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/8O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_O_M_Sm_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 02:02:05 ..... started STAR run
+Apr 24 02:02:05 ..... loading genome
+Apr 24 02:02:09 ..... started mapping
+Apr 24 02:09:56 ..... finished mapping
+Apr 24 02:09:56 ..... started sorting BAM
+Apr 24 02:10:30 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/9O_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/9O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_O_M_Big_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 02:10:31 ..... started STAR run
+Apr 24 02:10:31 ..... loading genome
+Apr 24 02:10:35 ..... started mapping
+Apr 24 02:14:21 ..... finished mapping
+Apr 24 02:14:21 ..... started sorting BAM
+Apr 24 02:14:28 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/10O_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/10O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_O_F_Big_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 02:14:28 ..... started STAR run
+Apr 24 02:14:28 ..... loading genome
+Apr 24 02:14:32 ..... started mapping
+Apr 24 02:19:58 ..... finished mapping
+Apr 24 02:19:58 ..... started sorting BAM
+Apr 24 02:20:14 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/11O_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/11O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_O_M_Sm_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 02:20:15 ..... started STAR run
+Apr 24 02:20:15 ..... loading genome
+Apr 24 02:20:18 ..... started mapping
+Apr 24 02:25:34 ..... finished mapping
+Apr 24 02:25:34 ..... started sorting BAM
+Apr 24 02:25:47 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/12O_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/12O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_O_F_Sm_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 02:25:48 ..... started STAR run
+Apr 24 02:25:48 ..... loading genome
+Apr 24 02:25:52 ..... started mapping
+Apr 24 02:27:54 ..... finished mapping
+Apr 24 02:27:54 ..... started sorting BAM
+Apr 24 02:28:01 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/13O_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/13O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_O_F_Sm_4
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 02:28:01 ..... started STAR run
+Apr 24 02:28:01 ..... loading genome
+Apr 24 02:28:05 ..... started mapping
+Apr 24 02:35:40 ..... finished mapping
+Apr 24 02:35:40 ..... started sorting BAM
+Apr 24 02:36:01 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/14O_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/14O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_O_M_Big_4
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 02:36:02 ..... started STAR run
+Apr 24 02:36:02 ..... loading genome
+Apr 24 02:36:06 ..... started mapping
+Apr 24 02:41:29 ..... finished mapping
+Apr 24 02:41:30 ..... started sorting BAM
+Apr 24 02:41:53 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/15O_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/15O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_O_M_Sm_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 02:41:54 ..... started STAR run
+Apr 24 02:41:54 ..... loading genome
+Apr 24 02:41:57 ..... started mapping
+Apr 24 02:51:49 ..... finished mapping
+Apr 24 02:51:49 ..... started sorting BAM
+Apr 24 02:51:55 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/16O_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/16O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_O_F_Sm_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 02:51:55 ..... started STAR run
+Apr 24 02:51:55 ..... loading genome
+Apr 24 02:51:59 ..... started mapping
+Apr 24 03:00:03 ..... finished mapping
+Apr 24 03:00:04 ..... started sorting BAM
+Apr 24 03:00:21 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/17O_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/17O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_O_M_Big_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 03:00:21 ..... started STAR run
+Apr 24 03:00:21 ..... loading genome
+Apr 24 03:00:25 ..... started mapping
+Apr 24 03:07:37 ..... finished mapping
+Apr 24 03:07:37 ..... started sorting BAM
+Apr 24 03:07:48 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/18O_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/18O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_O_F_Big_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 03:07:48 ..... started STAR run
+Apr 24 03:07:48 ..... loading genome
+Apr 24 03:07:52 ..... started mapping
+Apr 24 03:14:22 ..... finished mapping
+Apr 24 03:14:23 ..... started sorting BAM
+Apr 24 03:14:31 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/19O_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/19O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_O_M_Sm_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 03:14:31 ..... started STAR run
+Apr 24 03:14:31 ..... loading genome
+Apr 24 03:14:35 ..... started mapping
+Apr 24 03:19:35 ..... finished mapping
+Apr 24 03:19:36 ..... started sorting BAM
+Apr 24 03:19:51 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/20O_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/20O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_O_M_Big_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 03:19:51 ..... started STAR run
+Apr 24 03:19:51 ..... loading genome
+Apr 24 03:19:55 ..... started mapping
+Apr 24 03:26:37 ..... finished mapping
+Apr 24 03:26:38 ..... started sorting BAM
+Apr 24 03:26:50 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/22O_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/22O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_O_F_Big_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 03:26:50 ..... started STAR run
+Apr 24 03:26:50 ..... loading genome
+Apr 24 03:26:54 ..... started mapping
+Apr 24 03:37:04 ..... finished mapping
+Apr 24 03:37:05 ..... started sorting BAM
+Apr 24 03:37:18 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/24O_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/24O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_O_F_Big_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 03:37:18 ..... started STAR run
+Apr 24 03:37:18 ..... loading genome
+Apr 24 03:37:22 ..... started mapping
+Apr 24 03:44:13 ..... finished mapping
+Apr 24 03:44:13 ..... started sorting BAM
+Apr 24 03:44:27 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/25O_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/25O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_O_F_Sm_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 03:44:27 ..... started STAR run
+Apr 24 03:44:27 ..... loading genome
+Apr 24 03:44:31 ..... started mapping
+Apr 24 03:47:50 ..... finished mapping
+Apr 24 03:47:50 ..... started sorting BAM
+Apr 24 03:47:53 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/26O_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/26O_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_O_F_Sm_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 03:47:53 ..... started STAR run
+Apr 24 03:47:53 ..... loading genome
+Apr 24 03:47:57 ..... started mapping
+Apr 24 03:54:38 ..... finished mapping
+Apr 24 03:54:38 ..... started sorting BAM
+Apr 24 03:54:49 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/1P_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/1P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_P_M_Sm_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 03:54:49 ..... started STAR run
+Apr 24 03:54:49 ..... loading genome
+Apr 24 03:54:53 ..... started mapping
+Apr 24 04:01:33 ..... finished mapping
+Apr 24 04:01:33 ..... started sorting BAM
+Apr 24 04:01:42 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/2P_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/2P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_P_F_Big_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 04:01:43 ..... started STAR run
+Apr 24 04:01:43 ..... loading genome
+Apr 24 04:01:47 ..... started mapping
+Apr 24 04:04:21 ..... finished mapping
+Apr 24 04:04:21 ..... started sorting BAM
+Apr 24 04:04:28 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/3P_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/3P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_P_M_Big_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 04:04:29 ..... started STAR run
+Apr 24 04:04:29 ..... loading genome
+Apr 24 04:04:33 ..... started mapping
+Apr 24 04:07:55 ..... finished mapping
+Apr 24 04:07:56 ..... started sorting BAM
+Apr 24 04:08:03 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/4P_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/4P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_P_F_Big_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 04:08:03 ..... started STAR run
+Apr 24 04:08:03 ..... loading genome
+Apr 24 04:08:07 ..... started mapping
+Apr 24 04:12:57 ..... finished mapping
+Apr 24 04:12:58 ..... started sorting BAM
+Apr 24 04:13:04 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/5P_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/5P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_P_F_Sm_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 04:13:05 ..... started STAR run
+Apr 24 04:13:05 ..... loading genome
+Apr 24 04:13:08 ..... started mapping
+Apr 24 04:19:11 ..... finished mapping
+Apr 24 04:19:12 ..... started sorting BAM
+Apr 24 04:19:25 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/6P_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/6P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_P_M_Big_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 04:19:26 ..... started STAR run
+Apr 24 04:19:26 ..... loading genome
+Apr 24 04:19:30 ..... started mapping
+Apr 24 04:27:16 ..... finished mapping
+Apr 24 04:27:16 ..... started sorting BAM
+Apr 24 04:27:30 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/7P_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/7P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_P_F_Sm_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 04:27:30 ..... started STAR run
+Apr 24 04:27:30 ..... loading genome
+Apr 24 04:27:34 ..... started mapping
+Apr 24 04:30:37 ..... finished mapping
+Apr 24 04:30:37 ..... started sorting BAM
+Apr 24 04:30:42 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/8P_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/8P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_P_M_Sm_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 04:30:43 ..... started STAR run
+Apr 24 04:30:43 ..... loading genome
+Apr 24 04:30:46 ..... started mapping
+Apr 24 04:34:25 ..... finished mapping
+Apr 24 04:34:25 ..... started sorting BAM
+Apr 24 04:34:27 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/9P_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/9P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_P_M_Big_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 04:34:28 ..... started STAR run
+Apr 24 04:34:28 ..... loading genome
+Apr 24 04:34:32 ..... started mapping
+Apr 24 04:45:48 ..... finished mapping
+Apr 24 04:45:49 ..... started sorting BAM
+Apr 24 04:46:00 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/10P_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/10P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_P_F_Big_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 04:46:00 ..... started STAR run
+Apr 24 04:46:00 ..... loading genome
+Apr 24 04:46:04 ..... started mapping
+Apr 24 04:48:47 ..... finished mapping
+Apr 24 04:48:48 ..... started sorting BAM
+Apr 24 04:48:56 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/11P_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/11P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_P_M_Sm_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 04:48:56 ..... started STAR run
+Apr 24 04:48:56 ..... loading genome
+Apr 24 04:49:00 ..... started mapping
+Apr 24 04:52:31 ..... finished mapping
+Apr 24 04:52:31 ..... started sorting BAM
+Apr 24 04:52:41 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/12P_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/12P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_P_F_Sm_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 04:52:42 ..... started STAR run
+Apr 24 04:52:42 ..... loading genome
+Apr 24 04:52:46 ..... started mapping
+Apr 24 04:56:12 ..... finished mapping
+Apr 24 04:56:12 ..... started sorting BAM
+Apr 24 04:56:36 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/13P_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/13P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_P_F_Sm_4
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 04:56:37 ..... started STAR run
+Apr 24 04:56:37 ..... loading genome
+Apr 24 04:56:40 ..... started mapping
+Apr 24 04:58:45 ..... finished mapping
+Apr 24 04:58:46 ..... started sorting BAM
+Apr 24 04:58:50 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JT_Reads/cleanup/14P_R_1.fq /mnt/ceph/andersond/JT_Reads/cleanup/14P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jt_P_M_Big_4
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 04:58:50 ..... started STAR run
+Apr 24 04:58:50 ..... loading genome
+Apr 24 04:58:54 ..... started mapping
+Apr 24 05:06:45 ..... finished mapping
+Apr 24 05:06:46 ..... started sorting BAM
+Apr 24 05:07:22 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/15P_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/15P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_P_M_Sm_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 05:07:23 ..... started STAR run
+Apr 24 05:07:23 ..... loading genome
+Apr 24 05:07:27 ..... started mapping
+Apr 24 05:14:35 ..... finished mapping
+Apr 24 05:14:35 ..... started sorting BAM
+Apr 24 05:14:44 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/16P_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/16P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_P_F_Sm_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 05:14:45 ..... started STAR run
+Apr 24 05:14:45 ..... loading genome
+Apr 24 05:14:49 ..... started mapping
+Apr 24 05:21:43 ..... finished mapping
+Apr 24 05:21:44 ..... started sorting BAM
+Apr 24 05:22:12 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/17P_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/17P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_P_M_Big_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 05:22:13 ..... started STAR run
+Apr 24 05:22:13 ..... loading genome
+Apr 24 05:22:16 ..... started mapping
+Apr 24 05:29:25 ..... finished mapping
+Apr 24 05:29:26 ..... started sorting BAM
+Apr 24 05:29:48 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/18P_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/18P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_P_F_Big_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 05:29:49 ..... started STAR run
+Apr 24 05:29:49 ..... loading genome
+Apr 24 05:29:53 ..... started mapping
+Apr 24 05:38:06 ..... finished mapping
+Apr 24 05:38:06 ..... started sorting BAM
+Apr 24 05:38:24 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/19P_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/19P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_P_M_Sm_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 05:38:25 ..... started STAR run
+Apr 24 05:38:25 ..... loading genome
+Apr 24 05:38:28 ..... started mapping
+Apr 24 05:43:43 ..... finished mapping
+Apr 24 05:43:44 ..... started sorting BAM
+Apr 24 05:44:18 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/20P_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/20P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_P_M_Big_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 05:44:19 ..... started STAR run
+Apr 24 05:44:19 ..... loading genome
+Apr 24 05:44:23 ..... started mapping
+Apr 24 05:49:50 ..... finished mapping
+Apr 24 05:49:50 ..... started sorting BAM
+Apr 24 05:49:55 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/22P_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/22P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_P_F_Big_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 05:49:55 ..... started STAR run
+Apr 24 05:49:55 ..... loading genome
+Apr 24 05:49:59 ..... started mapping
+Apr 24 05:59:02 ..... finished mapping
+Apr 24 05:59:03 ..... started sorting BAM
+Apr 24 05:59:19 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/24P_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/24P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_P_F_Big_1
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 05:59:19 ..... started STAR run
+Apr 24 05:59:19 ..... loading genome
+Apr 24 05:59:23 ..... started mapping
+Apr 24 06:08:03 ..... finished mapping
+Apr 24 06:08:03 ..... started sorting BAM
+Apr 24 06:08:14 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/25P_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/25P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_P_F_Sm_2
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 06:08:14 ..... started STAR run
+Apr 24 06:08:14 ..... loading genome
+Apr 24 06:08:18 ..... started mapping
+Apr 24 06:14:28 ..... finished mapping
+Apr 24 06:14:29 ..... started sorting BAM
+Apr 24 06:14:35 ..... finished successfully
+	STAR --runThreadN 16 --genomeDir refdir --readFilesIn /mnt/ceph/andersond/JM_Reads/cleanup/26P_R_1.fq /mnt/ceph/andersond/JM_Reads/cleanup/26P_R_2.fq --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix aligned/Jm_P_F_Sm_3
+	STAR version: 2.7.11b   compiled: 2024-03-27T15:52:40-07:00 :/builddir/build/BUILD/star/source
+Apr 24 06:14:35 ..... started STAR run
+Apr 24 06:14:35 ..... loading genome
+Apr 24 06:14:39 ..... started mapping
+Apr 24 06:19:45 ..... finished mapping
+Apr 24 06:19:46 ..... started sorting BAM
+Apr 24 06:19:51 ..... finished successfully
